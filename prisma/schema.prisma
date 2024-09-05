@@ -1,0 +1,16 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model GameSession {
+  id        String   @id @default(uuid())
+  pin       String   @unique
+  createdAt DateTime @default(now())
+
+  @@map("game_sessions")
+}
