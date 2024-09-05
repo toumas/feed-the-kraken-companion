@@ -11,6 +11,11 @@ model GameSession {
   id        String   @id @default(uuid())
   pin       String   @unique
   createdAt DateTime @default(now())
+  players   Player[]
+}
 
-  @@map("game_sessions")
+model Player {
+  id            String      @id @default(uuid())
+  gameSession   GameSession @relation(fields: [gameSessionId], references: [id])
+  gameSessionId String
 }
