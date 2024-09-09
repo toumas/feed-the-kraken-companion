@@ -1,29 +1,50 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 const HostGame: React.FC = () => {
-  const [pin, setPin] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
 
   const handleHostGame = async () => {
     try {
-      const response = await fetch('/api/gameSession/create', {
+      const createResponse = await fetch('/api/gameSession/create', {
         method: 'POST',
       })
 
-      if (!response.ok) {
-        throw new Error('Failed to create game')
+      if (!createResponse.ok) {
+        const errorData = await createResponse.json()
+        throw new Error(`Failed to create game: ${errorData.error || 'Unknown error'}`)
       }
 
-      const data = await response.json()
-      setPin(data.gameSession.pin)
-      setError(null)
+      const createData = await createResponse.json()
+      console.log('Game created:', createData)
+
+      // Join the created game
+      const joinResponse = await fetch('/api/join-game', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ pin: createData.gameSession.pin }),
+      })
+
+      if (!joinResponse.ok) {
+        const errorData = await joinResponse.json()
+        throw new Error(`Failed to join game: ${errorData.message || 'Unknown error'}`)
+      }
+
+      const joinData = await joinResponse.json()
+      console.log('Game joined:', joinData)
+
+      // Navigate to the game page
+      router.push(`/game/${createData.gameSession.id}`)
     } catch (err) {
-      setError('Failed to create game. Please try again.')
+      setError(err instanceof Error ? err.message : 'An unknown error occurred')
       console.error('Error hosting game:', err)
     }
   }
@@ -34,15 +55,7 @@ const HostGame: React.FC = () => {
         <CardTitle>Host a Game</CardTitle>
       </CardHeader>
       <CardContent>
-        {!pin && (
-          <Button onClick={handleHostGame}>Create New Game</Button>
-        )}
-        {pin && (
-          <div className="space-y-2">
-            <p className="font-semibold">Game PIN: {pin}</p>
-            <p>Share this PIN with other players to join your game.</p>
-          </div>
-        )}
+        <Button onClick={handleHostGame}>Create and Join New Game</Button>
         {error && (
           <Alert variant="destructive" className="mt-4">
             <AlertTitle>Error</AlertTitle>
