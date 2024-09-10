@@ -1,11 +1,16 @@
-import { PrismaClient } from '@prisma/client'
 import prisma from '@/lib/prisma';
 
 export interface GameSession {
   id: string;
   pin: string;
   createdAt: Date;
-  // Add other properties as needed, e.g., players, gameState, etc.
+  players: Player[];
+}
+
+export interface Player {
+  id: string;
+  name: string;
+  gameSessionId: string;
 }
 
 export async function createGameSession(pin: string): Promise<GameSession> {
@@ -13,23 +18,23 @@ export async function createGameSession(pin: string): Promise<GameSession> {
     data: {
       pin,
     },
+    include: { players: true },
   });
 }
 
 export async function getGameSessionByPin(pin: string): Promise<GameSession | null> {
   return prisma.gameSession.findUnique({
-    where: {
-      pin,
-    },
+    where: { pin },
+    include: { players: true },
   });
 }
 
-export async function addPlayerToGameSession(gameSessionId: string, playerId: string): Promise<void> {
+export async function addPlayerToGameSession(gameSessionId: string, name: string): Promise<void> {
   await prisma.gameSession.update({
     where: { id: gameSessionId },
     data: {
       players: {
-        create: { id: playerId }
+        create: { name }
       }
     }
   });
@@ -41,5 +46,3 @@ export async function getGameSessionWithPlayers(gameSessionId: string): Promise<
     include: { players: true }
   });
 }
-
-// ... existing code ...

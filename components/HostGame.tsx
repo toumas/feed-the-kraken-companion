@@ -5,15 +5,26 @@ import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Input } from "@/components/ui/input"
 
 const HostGame: React.FC = () => {
+  const [name, setName] = useState('')
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
   const handleHostGame = async () => {
+    if (!name.trim()) {
+      setError('Please enter your name')
+      return
+    }
+
     try {
       const createResponse = await fetch('/api/gameSession/create', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ hostName: name }),
       })
 
       if (!createResponse.ok) {
@@ -23,23 +34,6 @@ const HostGame: React.FC = () => {
 
       const createData = await createResponse.json()
       console.log('Game created:', createData)
-
-      // Join the created game
-      const joinResponse = await fetch('/api/join-game', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ pin: createData.gameSession.pin }),
-      })
-
-      if (!joinResponse.ok) {
-        const errorData = await joinResponse.json()
-        throw new Error(`Failed to join game: ${errorData.message || 'Unknown error'}`)
-      }
-
-      const joinData = await joinResponse.json()
-      console.log('Game joined:', joinData)
 
       // Navigate to the game page
       router.push(`/game/${createData.gameSession.id}`)
@@ -55,7 +49,17 @@ const HostGame: React.FC = () => {
         <CardTitle>Host a Game</CardTitle>
       </CardHeader>
       <CardContent>
-        <Button onClick={handleHostGame}>Create and Join New Game</Button>
+        <div className="space-y-4">
+          <Input
+            type="text"
+            placeholder="Enter your name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <Button onClick={handleHostGame} disabled={!name.trim()}>
+            Create and Join New Game
+          </Button>
+        </div>
         {error && (
           <Alert variant="destructive" className="mt-4">
             <AlertTitle>Error</AlertTitle>

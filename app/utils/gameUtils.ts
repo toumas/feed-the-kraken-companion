@@ -2,16 +2,13 @@ import { getGameSessionByPin, addPlayerToGameSession } from '@/models/gameSessio
 
 // Remove the PrismaClient import and initialization
 
-export async function joinGame(pin: string): Promise<string> {
+export async function joinGame(pin: string, name: string): Promise<string> {
   const gameSession = await getGameSessionByPin(pin);
   if (!gameSession) {
     throw new Error('Game not found');
   }
   
-  // Add the player to the game session
-  // For now, we'll use a random player ID. In a real app, you'd use the authenticated user's ID
-  const playerId = Math.random().toString(36).substring(7);
-  await addPlayerToGameSession(gameSession.id, playerId);
+  await addPlayerToGameSession(gameSession.id, name);
   
   return gameSession.id;
 }
