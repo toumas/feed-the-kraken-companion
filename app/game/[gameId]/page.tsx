@@ -2,6 +2,7 @@ import React from 'react';
 import { getGameSessionWithPlayers } from '@/models/gameSession';
 import CopyPinButton from '@/components/CopyPinButton';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface GamePageProps {
   params: {
@@ -26,12 +27,22 @@ export default async function GamePage({ params }: GamePageProps) {
         <p>Game ID: {gameId}</p>
         <p>Game PIN: {gameSession.pin}</p>
         <CopyPinButton pin={gameSession.pin} />
-        <p>Players:</p>
-        <ul>
-          {gameSession.players.map(player => (
-            <li key={player.id}>{player.id}</li>
-          ))}
-        </ul>
+        
+        <h3 className="mt-4 mb-2 font-semibold">Players</h3>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {gameSession.players.map(player => (
+              <TableRow key={player.id}>
+                <TableCell>{player.name}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </CardContent>
     </Card>
   );
