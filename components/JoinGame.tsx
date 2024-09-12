@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { joinGame } from '@/app/utils/gameUtils';
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
@@ -10,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 
 function JoinGame() {
   const [pin, setPin] = useState('');
+  const [name, setName] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
 
@@ -22,33 +22,26 @@ function JoinGame() {
       return;
     }
 
+    if (!name.trim()) {
+      setError('Please enter your name');
+      return;
+    }
+
     try {
       const response = await fetch('/api/join-game', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ pin }),
+        body: JSON.stringify({ pin, name }),
       });
 
-      console.log('Response status:', response.status);
-      console.log('Response headers:', response.headers);
-
-      const text = await response.text();
-      console.log('Response text:', text);
-
-      let data;
-      try {
-        data = JSON.parse(text);
-      } catch (parseError) {
-        console.error('Error parsing JSON:', parseError);
-        throw new Error('Received non-JSON response from server');
-      }
-
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to join game');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to join game');
       }
 
+      const data = await response.json();
       router.push(`/game/${data.gameId}`);
     } catch (err) {
       console.error('Error joining game:', err);
@@ -72,11 +65,18 @@ function JoinGame() {
               maxLength={6}
               required
             />
+            <Input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter your name"
+              required
+            />
           </div>
         </form>
       </CardContent>
       <CardFooter className="flex justify-between">
-        <Button type="submit" onClick={handleSubmit}>Join</Button>
+        <Button type="submit" onClick={handleSubmit} disabled={!pin.trim() || !name.trim()}>Join</Button>
       </CardFooter>
       {error && (
         <Alert variant="destructive" className="mt-4">
