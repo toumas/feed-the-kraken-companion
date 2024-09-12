@@ -6,24 +6,34 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Label } from "@/components/ui/label"
 
 function JoinGame() {
   const [pin, setPin] = useState('');
   const [name, setName] = useState('');
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState<string[]>([]);
+  const [pinError, setPinError] = useState('');
+  const [nameError, setNameError] = useState('');
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    const newErrors: string[] = [];
+    setPinError('');
+    setNameError('');
 
     if (pin.length !== 6 || isNaN(Number(pin))) {
-      setError('PIN must be a 6-digit number');
-      return;
+      newErrors.push('PIN must be a 6-digit number');
+      setPinError('PIN must be a 6-digit number');
     }
 
     if (!name.trim()) {
-      setError('Please enter your name');
+      newErrors.push('Please enter your name');
+      setNameError('Please enter your name');
+    }
+
+    if (newErrors.length > 0) {
+      setErrors(newErrors);
       return;
     }
 
@@ -45,7 +55,7 @@ function JoinGame() {
       router.push(`/game/${data.gameId}`);
     } catch (err) {
       console.error('Error joining game:', err);
-      setError(err instanceof Error ? err.message : 'Failed to join game');
+      setErrors([err instanceof Error ? err.message : 'Failed to join game']);
     }
   };
 
@@ -57,32 +67,39 @@ function JoinGame() {
       <CardContent>
         <form onSubmit={handleSubmit}>
           <div className="grid w-full items-center gap-4">
-            <Input
-              type="text"
-              value={pin}
-              onChange={(e) => setPin(e.target.value)}
-              placeholder="Enter 6-digit game PIN"
-              maxLength={6}
-              required
-            />
-            <Input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter your name"
-              required
-            />
+            <div className="space-y-2">
+              <Label htmlFor="pin">Game PIN</Label>
+              <Input
+                id="pin"
+                type="text"
+                value={pin}
+                onChange={(e) => setPin(e.target.value)}
+                placeholder="Enter 6-digit game PIN"
+                maxLength={6}
+                required
+                className={pinError ? "border-red-500" : ""}
+              />
+              {pinError && <p className="text-sm text-red-500">{pinError}</p>}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="name">Your Name</Label>
+              <Input
+                id="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter your name"
+                required
+                className={nameError ? "border-red-500" : ""}
+              />
+              {nameError && <p className="text-sm text-red-500">{nameError}</p>}
+            </div>
           </div>
         </form>
       </CardContent>
       <CardFooter className="flex justify-between">
-        <Button type="submit" onClick={handleSubmit} disabled={!pin.trim() || !name.trim()}>Join</Button>
+        <Button type="submit" onClick={handleSubmit}>Join</Button>
       </CardFooter>
-      {error && (
-        <Alert variant="destructive" className="mt-4">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
     </Card>
   );
 }

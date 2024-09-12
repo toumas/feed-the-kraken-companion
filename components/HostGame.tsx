@@ -6,15 +6,25 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 const HostGame: React.FC = () => {
   const [name, setName] = useState('')
-  const [error, setError] = useState<string | null>(null)
+  const [errors, setErrors] = useState<string[]>([])
+  const [nameError, setNameError] = useState('')
   const router = useRouter()
 
   const handleHostGame = async () => {
+    const newErrors: string[] = []
+    setNameError('')
+
     if (!name.trim()) {
-      setError('Please enter your name')
+      newErrors.push('Please enter your name')
+      setNameError('Please enter your name')
+    }
+
+    if (newErrors.length > 0) {
+      setErrors(newErrors)
       return
     }
 
@@ -38,7 +48,7 @@ const HostGame: React.FC = () => {
       // Navigate to the game page
       router.push(`/game/${createData.gameSession.id}`)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred')
+      setErrors([err instanceof Error ? err.message : 'An unknown error occurred'])
       console.error('Error hosting game:', err)
     }
   }
@@ -50,22 +60,22 @@ const HostGame: React.FC = () => {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <Input
-            type="text"
-            placeholder="Enter your name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <Button onClick={handleHostGame} disabled={!name.trim()}>
+          <div className="space-y-2">
+            <Label htmlFor="name">Your Name</Label>
+            <Input
+              id="name"
+              type="text"
+              placeholder="Enter your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className={nameError ? "border-red-500" : ""}
+            />
+            {nameError && <p className="text-sm text-red-500">{nameError}</p>}
+          </div>
+          <Button onClick={handleHostGame}>
             Create and Join New Game
           </Button>
         </div>
-        {error && (
-          <Alert variant="destructive" className="mt-4">
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
       </CardContent>
     </Card>
   )
