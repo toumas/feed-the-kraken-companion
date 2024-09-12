@@ -1,20 +1,25 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { generateUniquePin } from '@/utils/pinGenerator';
-import { createGameSession } from '@/models/gameSession';
-import { joinGame } from '@/app/utils/gameUtils';
+import { NextResponse } from 'next/server';
+import { createGameSession, addPlayerToGameSession } from '@/models/gameSession';
 
-export async function POST(req: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const { hostName } = await req.json();
-    const pin = await generateUniquePin();
-    const gameSession = await createGameSession(pin);
-    
-    // Join the game as the host
-    await joinGame(pin, hostName);
+    const { hostName } = await request.json();
 
-    return NextResponse.json({ success: true, gameSession: { id: gameSession.id, pin: gameSession.pin } }, { status: 201 });
+    if (!hostName) {
+      return NextResponse.json({ error: 'Host name is required' }, { status: 400 });
+    }
+
+    // Generate a unique 6-digit PIN
+    const pin = Math.floor(100000 + Math.random() * 900000).toString();
+
+    const gameSession = await createGameSession(pin);
+
+    // Add the host as the first player
+    await addPlayerToGameSession(gameSession.id, hostName);
+
+    return NextResponse.json({ gameSession });
   } catch (error) {
     console.error('Error creating game session:', error);
-    return NextResponse.json({ success: false, error: 'Failed to create game session' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to create game session' }, { status: 500 });
   }
 }

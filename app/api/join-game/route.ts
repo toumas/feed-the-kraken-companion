@@ -1,25 +1,21 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { joinGame } from '@/app/utils/gameUtils';
+import { NextResponse } from 'next/server';
+import { getGameSessionByPin, addPlayerToGameSession } from '@/models/gameSession';
 
-export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const { pin, name } = body;
-
-  if (!pin || typeof pin !== 'string' || pin.length !== 6 || isNaN(Number(pin))) {
-    return NextResponse.json({ message: 'Invalid PIN format' }, { status: 400 });
-  }
-
-  if (!name || typeof name !== 'string' || name.trim().length === 0) {
-    return NextResponse.json({ message: 'Invalid name' }, { status: 400 });
-  }
+export async function POST(request: Request) {
+  const { pin, playerName } = await request.json();
 
   try {
-    const gameId = await joinGame(pin, name);
-    return NextResponse.json({ gameId });
+    const gameSession = await getGameSessionByPin(pin);
+
+    if (!gameSession) {
+      return NextResponse.json({ error: 'Game not found' }, { status: 404 });
+    }
+
+    await addPlayerToGameSession(gameSession.id, playerName);
+
+    return NextResponse.json({ gameId: gameSession.id });
   } catch (error) {
-    return NextResponse.json(
-      { message: error instanceof Error ? error.message : 'Unknown error occurred' },
-      { status: 400 }
-    );
+    console.error('Error joining game:', error);
+    return NextResponse.json({ error: 'Failed to join game' }, { status: 500 });
   }
 }

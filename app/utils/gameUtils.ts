@@ -1,19 +1,27 @@
-import { getGameSessionByPin, addPlayerToGameSession } from '@/models/gameSession';
+export async function joinGame(pin: string, playerName: string): Promise<string> {
+  const response = await fetch('/api/join-game', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ pin, playerName }),
+  });
 
-// Remove the PrismaClient import and initialization
-
-export async function joinGame(pin: string, name: string): Promise<string> {
-  const gameSession = await getGameSessionByPin(pin);
-  if (!gameSession) {
-    throw new Error('Game not found');
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Failed to join game');
   }
-  
-  await addPlayerToGameSession(gameSession.id, name);
-  
-  return gameSession.id;
+
+  const data = await response.json();
+  return data.gameId;
 }
 
 export async function findGameByPin(pin: string): Promise<{ id: string } | null> {
-  const gameSession = await getGameSessionByPin(pin);
-  return gameSession ? { id: gameSession.id } : null;
+  const response = await fetch(`/api/find-game?pin=${pin}`);
+  
+  if (!response.ok) {
+    return null;
+  }
+
+  return response.json();
 }

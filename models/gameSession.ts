@@ -1,22 +1,13 @@
 import prisma from '@/lib/prisma';
+import type { GameSession, Player } from '@/types/gameSession';
 
-export interface GameSession {
-  id: string;
-  pin: string;
-  createdAt: Date;
-  players: Player[];
-}
-
-export interface Player {
-  id: string;
-  name: string;
-  gameSessionId: string;
-}
+export type { GameSession, Player };
 
 export async function createGameSession(pin: string): Promise<GameSession> {
   return prisma.gameSession.create({
     data: {
       pin,
+      players: { create: [] }, // Initialize with an empty array of players
     },
     include: { players: true },
   });
@@ -29,14 +20,21 @@ export async function getGameSessionByPin(pin: string): Promise<GameSession | nu
   });
 }
 
-export async function addPlayerToGameSession(gameSessionId: string, name: string): Promise<void> {
+export async function getGameSessionById(id: string): Promise<GameSession | null> {
+  return prisma.gameSession.findUnique({
+    where: { id },
+    include: { players: true },
+  });
+}
+
+export async function addPlayerToGameSession(gameId: string, playerName: string): Promise<void> {
   await prisma.gameSession.update({
-    where: { id: gameSessionId },
+    where: { id: gameId },
     data: {
       players: {
-        create: { name }
-      }
-    }
+        create: { name: playerName },
+      },
+    },
   });
 }
 
