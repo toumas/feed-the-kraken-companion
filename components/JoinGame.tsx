@@ -60,7 +60,7 @@ function JoinGame() {
   };
 
   return (
-    <Card className="w-[350px]">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>Join Game</CardTitle>
       </CardHeader>
@@ -97,8 +97,8 @@ function JoinGame() {
           </div>
         </form>
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button type="submit" onClick={handleSubmit}>Join</Button>
+      <CardFooter>
+        <Button type="submit" onClick={handleSubmit} className="w-full">Join</Button>
       </CardFooter>
     </Card>
   );

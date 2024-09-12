@@ -54,7 +54,7 @@ const HostGame: React.FC = () => {
   }
 
   return (
-    <Card className="w-[350px]">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>Host a Game</CardTitle>
       </CardHeader>
@@ -72,7 +72,7 @@ const HostGame: React.FC = () => {
             />
             {nameError && <p className="text-sm text-red-500">{nameError}</p>}
           </div>
-          <Button onClick={handleHostGame}>
+          <Button onClick={handleHostGame} className="w-full">
             Create and Join New Game
           </Button>
         </div>
