@@ -5,10 +5,6 @@ const nextConfig = {
     // Enable SWC
     swcMinify: true,
   },
-  // If you need specific Babel configurations, you can add them here
-  // babel: {
-  //   // Your Babel config
-  // },
 }
 
 module.exports = nextConfig
