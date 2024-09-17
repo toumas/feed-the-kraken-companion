@@ -2,7 +2,7 @@ import React from 'react';
 import { getGameSessionWithPlayers } from '@/models/gameSession';
 import CopyPinButton from '@/components/CopyPinButton';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import GameLobby from '@/components/GameLobby';
 
 interface GamePageProps {
   params: {
@@ -12,9 +12,9 @@ interface GamePageProps {
 
 export default async function GamePage({ params }: GamePageProps) {
   const { gameId } = params;
-  const gameSession = await getGameSessionWithPlayers(gameId);
+  const initialGameSession = await getGameSessionWithPlayers(gameId);
 
-  if (!gameSession) {
+  if (!initialGameSession) {
     return <div>Game not found</div>;
   }
 
@@ -25,24 +25,9 @@ export default async function GamePage({ params }: GamePageProps) {
       </CardHeader>
       <CardContent>
         <p>Game ID: {gameId}</p>
-        <p>Game PIN: {gameSession.pin}</p>
-        <CopyPinButton pin={gameSession.pin} />
-        
-        <h3 className="mt-4 mb-2 font-semibold">Players</h3>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {gameSession.players.map(player => (
-              <TableRow key={player.id}>
-                <TableCell>{player.name}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <p>Game PIN: {initialGameSession.pin}</p>
+        <CopyPinButton pin={initialGameSession.pin} />
+        <GameLobby initialGameSession={initialGameSession} gameId={gameId} />
       </CardContent>
     </Card>
   );
