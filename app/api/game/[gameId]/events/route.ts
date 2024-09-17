@@ -28,8 +28,8 @@ export async function GET(
       const event = `data: ${JSON.stringify(gameSession)}\n\n`;
       await writer.write(new TextEncoder().encode(event));
 
-      // Send updates every 5 seconds
-      setTimeout(sendEvent, 5000);
+      // Send updates every 0.5 seconds
+      setTimeout(sendEvent, 500);
     } catch (error) {
       console.error('Error sending SSE:', error);
       await writer.close();

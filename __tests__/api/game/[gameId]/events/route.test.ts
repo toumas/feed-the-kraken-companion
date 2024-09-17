@@ -87,7 +87,7 @@ describe('GET function', () => {
     expect(mockWriter.close).toHaveBeenCalled();
   });
 
-  it('should continue sending events every 5 seconds', async () => {
+  it('should continue sending events every 0.5 seconds', async () => {
     const mockGameSession = { id: 'test-game-id', data: 'test-data' };
     (getGameSessionById as jest.Mock).mockResolvedValue(mockGameSession);
 
@@ -95,7 +95,7 @@ describe('GET function', () => {
 
     // Advance time and run timers four times
     for (let i = 0; i < 4; i++) {
-      await jest.advanceTimersByTimeAsync(5000);
+      await jest.advanceTimersByTimeAsync(500);
     }
 
     expect(getGameSessionById).toHaveBeenCalledTimes(5); // Initial call + 4 timer calls
