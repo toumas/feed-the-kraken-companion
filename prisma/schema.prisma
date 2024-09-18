@@ -12,6 +12,8 @@ model GameSession {
   pin       String   @unique
   createdAt DateTime @default(now())
   players   Player[]
+  state     String   @default("lobby")
+  hostId    String?
 }
 
 model Player {

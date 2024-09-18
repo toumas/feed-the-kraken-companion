@@ -1,17 +1,19 @@
 import React from 'react';
 import { getGameSessionWithPlayers } from '@/models/gameSession';
-import CopyPinButton from '@/components/CopyPinButton';
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import GameLobby from '@/components/GameLobby';
+import GameDetails from '@/components/GameDetails';
 
 interface GamePageProps {
   params: {
     gameId: string;
   };
+  searchParams: {
+    playerId?: string;
+  };
 }
 
-export default async function GamePage({ params }: GamePageProps) {
+export default async function GamePage({ params, searchParams }: GamePageProps) {
   const { gameId } = params;
+  const { playerId } = searchParams;
   const initialGameSession = await getGameSessionWithPlayers(gameId);
 
   if (!initialGameSession) {
@@ -19,16 +21,10 @@ export default async function GamePage({ params }: GamePageProps) {
   }
 
   return (
-    <Card className="w-[350px]">
-      <CardHeader>
-        <CardTitle>Game Details</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p>Game ID: {gameId}</p>
-        <p>Game PIN: {initialGameSession.pin}</p>
-        <CopyPinButton pin={initialGameSession.pin} />
-        <GameLobby initialGameSession={initialGameSession} gameId={gameId} />
-      </CardContent>
-    </Card>
+    <GameDetails
+      initialGameSession={initialGameSession}
+      gameId={gameId}
+      playerId={playerId || ''}
+    />
   );
 }

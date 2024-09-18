@@ -36,10 +36,9 @@ const HostGame: React.FC = () => {
       }
 
       const createData = await createResponse.json()
-      console.log('Game created:', createData)
 
       // Navigate to the game page
-      router.push(`/game/${createData.gameSession.id}`)
+      router.push(`/game/${createData.gameSession.id}?playerId=${createData.playerId}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred')
       console.error('Error hosting game:', err)
