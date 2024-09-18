@@ -38,7 +38,7 @@ describe('HostGame', () => {
   it('creates a game and navigates to the game page on success', async () => {
     (global.fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve({ gameSession: { id: 'test-game-id' } }),
+      json: () => Promise.resolve({ gameSession: { id: 'test-game-id' }, playerId: 'test-player-id' }),
     });
 
     render(<HostGame />);
@@ -53,7 +53,7 @@ describe('HostGame', () => {
         },
         body: JSON.stringify({ hostName: 'Test Host' }),
       });
-      expect(mockPush).toHaveBeenCalledWith('/game/test-game-id');
+      expect(mockPush).toHaveBeenCalledWith('/game/test-game-id?playerId=test-player-id');
     });
   });
 

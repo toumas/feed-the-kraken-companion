@@ -35,8 +35,8 @@ describe('POST /api/gameSession/create', () => {
 
     expect(response.status).toBe(200);
     expect(responseData).toEqual({ gameSession: mockGameSession });
-    expect(createGameSession).toHaveBeenCalledWith(expect.any(String));
-    expect(addPlayerToGameSession).toHaveBeenCalledWith('mock-id', 'TestHost');
+    expect(createGameSession).toHaveBeenCalledWith(expect.any(String), 'TestHost');
+    expect(addPlayerToGameSession).not.toHaveBeenCalled();
   });
 
   it('should return 400 if hostName is missing', async () => {
@@ -64,6 +64,6 @@ describe('POST /api/gameSession/create', () => {
     const responseData = await response.json();
 
     expect(response.status).toBe(500);
-    expect(responseData).toEqual({ error: 'Failed to create game session' });
+    expect(responseData).toEqual({ error: 'Failed to create game session: Database error' });
   });
 });
