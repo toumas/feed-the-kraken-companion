@@ -27,7 +27,8 @@
     "react-dom": "^18",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "xstate": "^5.18.2"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.5.0",

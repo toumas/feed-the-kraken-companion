@@ -8,40 +8,77 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
+// Simple UUID generation function
+const generateUUID = () => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 const HostGame: React.FC = () => {
   const [name, setName] = useState('')
   const [error, setError] = useState('')
   const router = useRouter()
 
   const handleHostGame = async () => {
+    console.log('Starting handleHostGame function');
     setError('');
 
     if (!name.trim()) {
+      console.log('Name is empty, setting error');
       setError('Please enter your name');
       return;
     }
 
     try {
-      const createResponse = await fetch('/api/gameSession/create', {
+      console.log('Attempting to create a new workflow');
+      // Create a new workflow
+      const createResponse = await fetch('/api/workflows', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ hostName: name }),
       })
 
       if (!createResponse.ok) {
         const errorData = await createResponse.json()
-        throw new Error(errorData.error || 'Failed to create game')
+        console.error('Failed to create workflow:', errorData);
+        throw new Error(errorData.error || 'Failed to create workflow')
       }
 
-      const createData = await createResponse.json()
+      const { workflowId } = await createResponse.json()
+      console.log('Workflow created successfully, workflowId:', workflowId);
+
+      // Generate a separate hostId
+      const hostId = generateUUID();
+      console.log('Generated hostId:', hostId);
+
+      console.log('Sending HOST_GAME event to the workflow');
+      // Send HOST_GAME event to the workflow
+      const hostResponse = await fetch(`/api/workflows/${workflowId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'HOST_GAME',
+          hostId: hostId,
+          hostName: name,
+        }),
+      })
+
+      if (!hostResponse.ok) {
+        const errorData = await hostResponse.json()
+        console.error('Failed to host game:', errorData);
+        throw new Error(errorData.error || 'Failed to host game')
+      }
+
+      console.log('HOST_GAME event sent successfully');
 
       // Navigate to the game page
-      router.push(`/game/${createData.gameSession.id}?playerId=${createData.playerId}`)
+      console.log('Navigating to game page');
+      router.push(`/game/${workflowId}`)
     } catch (err) {
+      console.error('Error in handleHostGame:', err);
       setError(err instanceof Error ? err.message : 'An unknown error occurred')
-      console.error('Error hosting game:', err)
     }
   }
 
