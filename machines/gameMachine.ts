@@ -12,7 +12,7 @@ export const gameMachine = setup({
       | { type: 'JOIN_GAME'; playerId: string; playerName: string },
   },
 }).createMachine({
-  /** @xstate-layout N4IgpgJg5mDOIC5RQIYFswDoCWEA2YAxABIDyAygCoD6A4gIICyAogNoAMAuoqAA4D2sbABds-AHY8QAD0QBGAGwAWADQgAnvKUBOTNoDsCgKwKATEYC+FtagyYAFoNHiohWswByzAEr1KzagAFAEkPDm4kEAEhUQkpWQQAZjklTCMlBQAOfSM1TQRMuTSrG3QsR1hnVwApUlC6JjYuKWiRMUlIhKVCzCVEnLz5I0zMU1NjM0sSkHF+CDgpWzAWwTa4zsQAWgVBhG3ppZx8ZcjW2I7QLtNduX1E0fZk8wOyhydsFxWY9vjERMSFHptKY5Nlchp5Jl2L0jE8pqU7AB3FBtFwAMX4ACdAngUOowJj4KdVudfggFNpUtp2JMblCYXCrFYgA */
+  /** @xstate-layout N4IgpgJg5mDOIC5RQIYFswDoCWEA2YAxABIDyAygCoD6A4gIICyAogNoAMAuoqAA4D2sbABds-AHY8QAD0QBGAGwAWTOzVq5ATgDM7AOwBWJQYUAaEAE95BuZk16FBvZrmubmgEx6Avt-OoMTAB3FBFscSgAMX4AJwAFPBQLMBjYQgApUgBJADk6JjYuKQEhUQkpWQRtbU1VPXZtOS8DBu0PE3MrBAAOWyVNAfsBrT09bW7fPxBxfgg4KQCwYsEw8qQZRABaM0sthV9-dCxcAmXSsUl1yqUPTvlDTA8GuSV9HXZ2pW0DkEXg0NEEWi8USyVSZ1Wl1AlUatSMCm6zhe2gMHhRdwQcm6HkwxkaHiU3RqSj0igmkyAA */
   id: 'game',
   initial: 'idle',
   context: {
@@ -24,18 +24,18 @@ export const gameMachine = setup({
     idle: {
       on: {
         HOST_GAME: {
-          target: 'hosting',
+          target: 'waitingForPlayers',
           actions: assign({
             hostId: ({ event }) => event.hostId,
             hostName: ({ event }) => event.hostName,
+            players: ({ event }) => [{ id: event.hostId, name: event.hostName }],
           }),
         },
       },
     },
-    hosting: {
+    waitingForPlayers: {
       on: {
         JOIN_GAME: {
-          target: 'waitingForPlayers',
           actions: assign({
             players: ({ context, event }) => [
               ...context.players,
@@ -44,9 +44,6 @@ export const gameMachine = setup({
           }),
         },
       },
-    },
-    waitingForPlayers: {
-      // Add more logic for waiting state
     },
   },
 });

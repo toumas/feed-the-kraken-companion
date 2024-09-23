@@ -15,23 +15,6 @@ interface GameDetailsProps {
 export default function GameDetails({ initialGameSession, gameId, playerId }: GameDetailsProps) {
   const [gameSession, setGameSession] = useState<GameSession | null>(initialGameSession);
 
-  useEffect(() => {
-    const eventSource = new EventSource(`/api/game/${gameId}/events`);
-
-    eventSource.onmessage = (event) => {
-      const updatedGameSession = JSON.parse(event.data);
-      setGameSession(prevState => ({...prevState, ...updatedGameSession}));
-    };
-
-    return () => {
-      eventSource.close();
-    };
-  }, [gameId]);
-
-  if (!gameSession) {
-    return <div>Loading game session...</div>;
-  }
-
   return (
     <Card className="w-[350px]">
       <CardHeader>

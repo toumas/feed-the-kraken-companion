@@ -13,6 +13,7 @@ interface GameLobbyProps {
 }
 
 export default function GameLobby({ gameSession, gameId, playerId }: GameLobbyProps) {
+  console.log('GameLobby', gameSession, gameId, playerId);
   const { toast } = useToast();
 
   const isHost = gameSession.hostId === playerId;
@@ -61,7 +62,7 @@ export default function GameLobby({ gameSession, gameId, playerId }: GameLobbyPr
           </TableRow>
         </TableHeader>
         <TableBody>
-          {gameSession.players.map(player => (
+          {gameSession.persistedState.context.players.map(player => (
             <TableRow key={player.id}>
               <TableCell>{player.name}</TableCell>
               <TableCell>{player.id === gameSession.hostId ? 'Host' : 'Player'}</TableCell>

@@ -73,6 +73,28 @@ const HostGame: React.FC = () => {
 
       console.log('HOST_GAME event sent successfully');
 
+      console.log('Sending JOIN_GAME event to the workflow');
+      // Send JOIN_GAME event to the workflow
+      const joinResponse = await fetch(`/api/workflows/${workflowId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'JOIN_GAME',
+          playerId: hostId,
+          playerName: name,
+        }),
+      })
+
+      if (!joinResponse.ok) {
+        const errorData = await joinResponse.json()
+        console.error('Failed to join game:', errorData);
+        throw new Error(errorData.error || 'Failed to join game')
+      }
+
+      console.log('JOIN_GAME event sent successfully');
+
       // Navigate to the game page
       console.log('Navigating to game page');
       router.push(`/game/${workflowId}`)
