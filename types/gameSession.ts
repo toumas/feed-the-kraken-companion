@@ -8,7 +8,6 @@ export interface Player {
 export interface GameSession {
   id: string;
   pin: string;
-  players: Player[];
   hostId: string | null;
   state: GameState;
 }

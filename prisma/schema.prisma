@@ -17,13 +17,6 @@ model GameSession {
   updatedAt      DateTime @updatedAt
 }
 
-model Player {
-  id            String      @id @default(uuid())
-  name          String
-  gameSession   GameSession @relation(fields: [gameSessionId], references: [id])
-  gameSessionId String
-}
-
 model MachineState {
   id         String   @id @default(cuid())
   workflowId String   @unique
