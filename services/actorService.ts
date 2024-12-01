@@ -1,4 +1,4 @@
-import { AnyStateMachine, createActor } from "xstate";
+import { AnyStateMachine, createActor, Snapshot } from "xstate";
 import prisma from '@/lib/prisma';
 
 // create an actor to be used in the API endpoints
@@ -41,23 +41,30 @@ export async function getDurableActor({
   });
 
   console.log('Setting up actor subscription');
-  // actor subcribe is called for every request which causes player join inaccuracies
   actor.subscribe({
     next: async () => {
       // on transition, persist the most recent actor state to the db
-      const persistedState = actor.getPersistedSnapshot();
+      const snapshot = actor.getPersistedSnapshot();
+      // Ensure the state is serializable by converting it to JSON
+      const persistedState = JSON.parse(JSON.stringify(snapshot));
+
       console.log("Persisting state for gameId:", gameId);
       console.log("Persisted state:", persistedState);
-      
-      try {
-        const result = await prisma.gameSession.update({
-          where: { id: gameId },
-          data: { persistedState },
-        });
 
-        if (!result) {
-          throw new Error("Failed to update game session");
-        }
+      try {
+        await prisma.$transaction(async (tx) => {
+          const result = await tx.gameSession.update({
+            where: { id: gameId },
+            data: {
+              persistedState: persistedState as any,
+              updatedAt: new Date(),
+            },
+          });
+
+          if (!result) {
+            throw new Error("Failed to update game session");
+          }
+        });
         console.log("Successfully persisted state to database");
       } catch (error) {
         console.error("Error persisting actor state:", error);
