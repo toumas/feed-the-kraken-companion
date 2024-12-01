@@ -15,6 +15,19 @@ interface GameDetailsProps {
 export default function GameDetails({ initialGameSession, gameId, playerId }: GameDetailsProps) {
   const [gameSession, setGameSession] = useState<GameSession | null>(initialGameSession);
 
+  if (!gameSession) {
+    return (
+      <Card className="w-[350px]">
+        <CardHeader>
+          <CardTitle>Game Details</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Game not found</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="w-[350px]">
       <CardHeader>
