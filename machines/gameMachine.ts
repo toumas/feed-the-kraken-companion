@@ -12,7 +12,7 @@ export const gameMachine = setup({
       | { type: 'JOIN_GAME'; playerId: string; playerName: string },
   },
 }).createMachine({
-  /** @xstate-layout N4IgpgJg5mDOIC5RQIYFswDoCWEA2YAxABIDyAygCoD6A4gIICyAogNoAMAuoqAA4D2sbABds-AHY8QAD0QBGAGwAWTOzVq5ATgDM7AOwBWJQYUAaEAE95BuZk16FBvZrmubmgEx6Avt-OoMTAB3FBFscSgAMX4AJwAFPBQLMBjYQgApUgBJADk6JjYuKQEhUQkpWQRtbU1VPXZtOS8DBu0PE3MrBAAOWyVNAfsBrT09bW7fPxBxfgg4KQCwYsEw8qQZRABaM0sthV9-dCxcAmXSsUl1yqUPTvlDTA8GuSV9HXZ2pW0DkEXg0NEEWi8USyVSZ1Wl1AlUatSMCm6zhe2gMHhRdwQcm6HkwxkaHiU3RqSj0igmkyAA */
+  /** @xstate-layout N4IgpgJg5mDOIC5RQIYFswDoCWEA2YAxABIDyAygCoD6A4gIICyAogNoAMAuoqAA4D2sbABds-AHY8QAD0QBGAGwAWADQgAnvICsczAE4A7Aq0HTWgBwHze9goC+dtagyYA7ihHZxUAGL8ATgAKeCjqYP6whABSpACSAHJ0TGxcUgJCohJSsggAzLl6mOwG7LlyAExaapoI5rpaDo4g4vwQcFLOYGmCnllIMogAtArVQ-ZNnTj4Xf3pvZL9OUrlowhyBlqY5aVySuyVlta2Dk7oWO6e3n5BIWER3RliC6A5ZYVaSgqWVRry5uWYJRaMp7A5WGzjBxAA */
   id: 'game',
   initial: 'idle',
   context: {
@@ -28,7 +28,6 @@ export const gameMachine = setup({
           actions: assign({
             hostId: ({ event }) => event.hostId,
             hostName: ({ event }) => event.hostName,
-            players: ({ event }) => [{ id: event.hostId, name: event.hostName }],
           }),
         },
       },

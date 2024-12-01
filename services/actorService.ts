@@ -41,6 +41,7 @@ export async function getDurableActor({
   });
 
   console.log('Setting up actor subscription');
+  // actor subcribe is called for every request which causes player join inaccuracies
   actor.subscribe({
     next: async () => {
       // on transition, persist the most recent actor state to the db

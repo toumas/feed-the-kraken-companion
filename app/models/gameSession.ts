@@ -12,11 +12,6 @@ export async function createGameSession(pin: string, hostName: string) {
   return prisma.gameSession.create({
     data: {
       pin,
-      players: {
-        create: {
-          name: hostName,
-        },
-      },
     },
   });
 }
@@ -24,12 +19,5 @@ export async function createGameSession(pin: string, hostName: string) {
 export async function addPlayerToGameSession(gameSessionId: string, name: string) {
   return prisma.gameSession.update({
     where: { id: gameSessionId },
-    data: {
-      players: {
-        create: {
-          name,
-        },
-      },
-    },
   });
 }
